@@ -1,25 +1,4 @@
 function varargout = TDTExtract_v10(varargin)
-% TDTEXTRACT_V10 MATLAB code for TDTExtract_v10.fig
-%      TDTEXTRACT_V10, by itself, creates a new TDTEXTRACT_V10 or raises the existing
-%      singleton*.
-%
-%      H = TDTEXTRACT_V10 returns the handle to a new TDTEXTRACT_V10 or the handle to
-%      the existing singleton*.
-%
-%      TDTEXTRACT_V10('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in TDTEXTRACT_V10.M with the given input arguments.
-%
-%      TDTEXTRACT_V10('Property','Value',...) creates a new TDTEXTRACT_V10 or raises the
-%      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before TDTExtract_v10_OpeningFcn gets called.  An
-%      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to TDTExtract_v10_OpeningFcn via varargin.
-%
-%      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
-%      instance to run (singleton)".
-%
-% See also: GUIDE, GUIDATA, GUIHANDLES
-
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
@@ -39,14 +18,8 @@ else
 end
 % End initialization code - DO NOT EDIT
 
-
 % --- Executes just before TDTExtract_v10 is made visible.
 function TDTExtract_v10_OpeningFcn(hObject, eventdata, handles, varargin)
-% This function has no output args, see OutputFcn.
-% hObject    handle to figure
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to TDTExtract_v10 (see VARARGIN)
 global TDTX;
 global currentServer;
 global currentTank;
@@ -112,12 +85,6 @@ event5TDT.SingleClickSelect = 1;
 
 % --- Outputs from this function are returned to the command line.
 function varargout = TDTExtract_v10_OutputFcn(hObject, eventdata, handles) 
-% varargout  cell array for returning output args (see VARARGOUT);
-% hObject    handle to figure
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Get default command line output from handles structure
 varargout{1} = handles.output;
 
 % --- Executes on button press in clearEvents.
@@ -296,6 +263,8 @@ for i=1:length(eventType)
     end
     switch eventType{1,i}{1,1}
         case '257' %257 = Strobe+ (e.g. "Tick")
+            disp('epoch data!')
+                extractEpochEvents(currentTank,currentBlock,directorySave,filenameSave,userT1,userT2,eventType{2,i});
         case '258' %258 = strobe-   
         case '513' %513 = scalar??? 
         case '33025' %33025 = stream
