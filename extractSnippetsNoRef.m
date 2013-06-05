@@ -1,4 +1,4 @@
-function extractSnippets (myTank, myBlock, myStore, myChannels, directorySave, OutFile, startTime, endTime)
+function extractSnippetsNoRef (myTank, myBlock, myStore, myChannels, directorySave, OutFile, startTime, endTime)
 
 maxMemUse = 1024;       % Maximum allowed memory, in MB
                         % 32bits * 25KHz sampling = 97 KB/chan/sec.
@@ -25,6 +25,9 @@ snippetData{1,2} = 'Snippet Data';
 snippetData{1,3} = 'Snippet Timestamps';
 snippetData{1,4} = 'Snippet Sort Codes';
 snippetData{1,5} = 'Snippet Channels';
+snippetData{1,6} = 'Sampling Reference Store';
+snippetData{1,7} = 'Reference Sampling Freq';
+snippetData{1,8} = 'Snippet Sample #s (Ref)';
 
 % Iterate through the channels.
 for i=1:length(myChannels)
@@ -39,11 +42,15 @@ for i=1:length(myChannels)
         spikeCodes = (TDTX.ParseEvInfoV(0,numEvents,5))';
         spikeChannels = (TDTX.ParseEvInfoV(0,numEvents,4))';
     end
+    
     snippetData{2,1} = myStore;
     snippetData{2,2} = spikeSnippets;
     snippetData{2,3} = spikeTimes;
     snippetData{2,4} = spikeCodes;
     snippetData{2,5} = spikeChannels;
+    snippetData{2,6} = 'No Reference Given';
+    snippetData{2,7} = 'No Reference Given';
+    snippetData{2,8] = 'No Reference Given';
     filenameSnippets = [directorySave '\' OutFile '_Channel_' num2str(myChannels(i)) '_extracted_snippets.mat'];
     save(filenameSnippets, 'numEvents','snippetData','-mat');
     disp(['Finished extracting snippets from channel ' num2str(myChannels(i)) '.']);

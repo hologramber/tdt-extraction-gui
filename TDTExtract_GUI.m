@@ -1,10 +1,10 @@
-function varargout = TDTExtract_v10(varargin)
-% Begin initialization code - DO NOT EDIT
+function varargout = TDTExtract_GUI(varargin)
+% Begin initialization code, probably don't want to edit this part.
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @TDTExtract_v10_OpeningFcn, ...
-                   'gui_OutputFcn',  @TDTExtract_v10_OutputFcn, ...
+                   'gui_OpeningFcn', @TDTExtract_GUI_OpeningFcn, ...
+                   'gui_OutputFcn',  @TDTExtract_GUI_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -16,19 +16,9 @@ if nargout
 else
     gui_mainfcn(gui_State, varargin{:});
 end
-% End initialization code - DO NOT EDIT
 
-% --- Executes just before TDTExtract_v10 is made visible.
-function TDTExtract_v10_OpeningFcn(hObject, eventdata, handles, varargin)
-global TDTX;
-global currentServer;
-global currentTank;
-global currentBlock;
-global currentEvent;
-global currentEvent2;
-global currentEvent3;
-global currentEvent4;
-global currentEvent5;
+% --- Executes just before TDTExtract_GUI is made visible.
+function TDTExtract_GUI_OpeningFcn(hObject, eventdata, handles, varargin)
 global tankTDT;
 global blockTDT;
 global eventTDT;
@@ -37,7 +27,7 @@ global event3TDT;
 global event4TDT;
 global event5TDT;
 
-handles.output = hObject;   % Choose default command line output for TDTExtract_v10
+handles.output = hObject;   % Choose default command line output for TDTExtract_GUI
 guidata(hObject, handles);  % Update handles structure
 
 tankTDT = actxcontrol('TANKSELECT.TankSelectActiveXCtrl.1','position',[20 680 375 150],'parent',hObject,'callback','tankChange');
@@ -71,20 +61,8 @@ event5TDT = actxcontrol('EVENTSELECT.EventSelectActiveXCtrl.1','position',[450 2
 event5TDT.HideDetails = 0;
 event5TDT.SingleClickSelect = 1;
 
-% tankev = tankTDT.events
-% blockev = blockTDT.events
-% eventev = eventTDT.events
-% 
-% tankinv = tankTDT.invoke
-% blockinv = blockTDT.invoke
-% eventinv = eventTDT.invoke
-% 
-% tankget = tankTDT.get
-% blockget = blockTDT.get
-% eventget = eventTDT.get
-
 % --- Outputs from this function are returned to the command line.
-function varargout = TDTExtract_v10_OutputFcn(hObject, eventdata, handles) 
+function varargout = TDTExtract_GUI_OutputFcn(hObject, eventdata, handles) 
 varargout{1} = handles.output;
 
 % --- Executes on button press in clearEvents.
@@ -180,6 +158,19 @@ if isempty(userT2)
 end
 guidata(hObject,handles);
 
+function epochSamplingRef_Callback(hObject, eventdata, handles)
+function epochSamplingRef_CreateFcn(hObject, eventdata, handles)
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+epochSamplingRef = get(hObject,'String');
+if  isempty(epochSamplingRef)
+    set(hObject,'String','n/a');
+    epochSamplingRef = 'n/a';
+end
+guidata(hObject,handles);
+
 %%%%%%%%%%%%% Filename Prefix via User
 function filenameSave_Callback(hObject, eventdata, handles)
 function filenameSave_CreateFcn(hObject, eventdata, handles)
@@ -217,23 +208,17 @@ guidata(hObject,handles);
 %   Data extraction is a go! Start extracting data!   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function extractDataGo_Callback(hObject, eventdata, handles)
-global currentServer;
 global currentTank;
 global currentBlock;
-global currentEvent;
-global currentEvent2;
-global currentEvent3;
-global currentEvent4;
-global currentEvent5;
 global eventType;
 
 userChannelList = get(handles.channelList,'String');
 userChunkSize = str2num(get(handles.chunkSize,'String'));
 userT1 = str2num(get(handles.startTime,'String'));
 userT2 = str2num(get(handles.endTime,'String'));
+epochSamplingRef = get(handles.epochSamplingRef,'String');
 filenameSave = get(handles.filenameSave,'String');
 directorySave = get(handles.directorySave,'String');
-
 guidata(hObject,handles);
 
 checkTypes;
@@ -262,24 +247,37 @@ for i=1:length(eventType)
         eventType{1,i}{1,1} = 'unused';
     end
     switch eventType{1,i}{1,1}
-        case '257' %257 = Strobe+ (e.g. "Tick")
-            disp('epoch data!')
-                extractEpochEvents(currentTank,currentBlock,directorySave,filenameSave,userT1,userT2,eventType{2,i});
-        case '258' %258 = strobe-   
-        case '513' %513 = scalar??? 
-        case '33025' %33025 = stream
-            disp('stream data!')
+        case '257'          %257 = Strobe+ (e.g. "Tick")
+                if (strcmp(epochSamplingRef,'n/a') || strcmp(epochSamplingRef,''))
+                    disp('WARNING: NO SAMPLING REFERENCE WAS GIVEN -- EXTRACTING BASE EPOCH VALUES.');
+                    extractEpochNoRef(currentTank,currentBlock,eventType{2,i},directorySave,filenameSave,userT1,userT2);
+                else
+                    disp('Extracting epoch data with given sampling reference');
+                    extractEpochWithRef(currentTank,currentBlock,eventType{2,i},directorySave,filenameSave,userT1,userT2,epochSamplingRef);
+                end
+        case '33025'        %33025 = stream
+            disp('Extracting stream data.')
             for definedChannel = inputChannels
                 extractTuckerDavisRaw(currentTank,currentBlock,eventType{2,i},definedChannel,directorySave,filenameSave,userChunkSize,userT1,userT2);
             end
-        case '33281' %33281 = snippet
-            disp('snippet data!')
-            extractSnippets(currentTank,currentBlock,eventType{2,i},inputChannels,directorySave,filenameSave,userT1,userT2);
-        case '34817' %34817 = mark???
-        case '32768' %32768 = hasdata?????
-        case 'unused'
-            disp('No event data!')
-        otherwise % 0 = unknown?????
-            error('Your data puzzles me. I cannot process it. [Data Type = Unknown]');
+        case '33281'        %33281 = snippet
+            if (strcmp(epochSamplingRef,'n/a') || strcmp(epochSamplingRef,''))
+                disp('No sampling reference given; extracting snippets without sample references.')
+                extractSnippetsNoRef(currentTank,currentBlock,eventType{2,i},inputChannels,directorySave,filenameSave,userT1,userT2);
+            else
+                disp('Extracting snippet data with sample references');
+                extractSnippetsWithRef(currentTank,currentBlock,eventType{2,i},inputChannels,directorySave,filenameSave,userT1,userT2,epochSamplingRef);
+            end
+        case '258'          %258 = strobe- ]
+            error('Error: This version of TDT GUI Extract does not support the STROBE- data type.');
+        case '513'          %513 = scalar? 
+            error('Error: This version of TDT GUI Extract does not support the SCALAR data type.');
+        case '34817'        %34817 = mark?
+            error('Error: This version of TDT GUI Extract does not support the MARK data type.');
+        case '32768'        %32768 = hasdata?
+            error('Error: This version of TDT GUI Extract does not support the HASDATA data type.');
+        case 'unused'       % unused
+        otherwise           %0 = unknown
+            error('Error: Data type unknown.');
     end
 end
