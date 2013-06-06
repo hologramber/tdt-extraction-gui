@@ -50,7 +50,7 @@ for i=1:length(myChannels)
     snippetData{2,5} = spikeChannels;
     snippetData{2,6} = 'No Reference Given';
     snippetData{2,7} = 'No Reference Given';
-    snippetData{2,8] = 'No Reference Given';
+    snippetData{2,8} = 'No Reference Given';
     filenameSnippets = [directorySave '\' OutFile '_Channel_' num2str(myChannels(i)) '_extracted_snippets.mat'];
     save(filenameSnippets, 'numEvents','snippetData','-mat');
     disp(['Finished extracting snippets from channel ' num2str(myChannels(i)) '.']);

@@ -12,6 +12,8 @@ global TDTX;
 if TDTX.ConnectServer('Local','Me') == 0 error('Error connecting to server'); end
 if TDTX.OpenTank(myTank,'R') == 0 error('Error opening tank'); end
 if TDTX.SelectBlock(['~' myBlock]); % ~ autogenerates epoch index
+TDTX.ResetFilters;
+TDTX.ResetGlobals;
 TDTX.SetGlobalV('WavesMemLimit',maxMemUse*1024*1024);
 TR = TDTX.GetValidTimeRangesV();
 
@@ -99,7 +101,7 @@ save(filenameTime,'extractedTimes','-mat')
 fclose(fidD);
 fclose(fidT);
 
-disp(['Finished saving channel ' num2str(Channel) ' data.']);
+disp(['Finished saving channel ' num2str(Channel) ' data (no zero-padding).']);
 TDTX.CloseTank;
 TDTX.ReleaseServer;
 

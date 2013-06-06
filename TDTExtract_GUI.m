@@ -198,6 +198,20 @@ if  isempty(directorySave)
 end
 guidata(hObject,handles);
 
+function method2Go_Callback(hObject, eventdata, handles)
+function method2Go_CreateFcn(hObject, eventdata, handles)
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+if (get(hObject,'Value') == get(hObject,'Max'));
+   disp('Method 2 checked.');
+else
+   disp('Method 2 unchecked');
+end
+
+guidata(hObject,handles);
+
 % --- Executes on button press in changesavedir.
 function changesavedir_Callback(hObject, eventdata, handles)
 newDirectory = uigetdir('','Please select a folder to save to:');
@@ -219,6 +233,7 @@ userT2 = str2num(get(handles.endTime,'String'));
 epochSamplingRef = get(handles.epochSamplingRef,'String');
 filenameSave = get(handles.filenameSave,'String');
 directorySave = get(handles.directorySave,'String');
+method2Go = get(handles.method2Go,'Value');
 guidata(hObject,handles);
 
 checkTypes;
@@ -256,10 +271,18 @@ for i=1:length(eventType)
                     extractEpochWithRef(currentTank,currentBlock,eventType{2,i},directorySave,filenameSave,userT1,userT2,epochSamplingRef);
                 end
         case '33025'        %33025 = stream
-            disp('Extracting stream data.')
-            for definedChannel = inputChannels
-                extractTuckerDavisRaw(currentTank,currentBlock,eventType{2,i},definedChannel,directorySave,filenameSave,userChunkSize,userT1,userT2);
+            if method2Go == 1
+                disp('Extracting stream data using method 2 (allows zero-padding).')
+                for definedChannel = inputChannels
+                    extractTuckerDavisRaw2(currentTank,currentBlock,eventType{2,i},definedChannel,directorySave,filenameSave);
+                end                
+            else
+                disp('Extracting stream data (no zero padding).')
+                for definedChannel = inputChannels
+                    extractTuckerDavisRaw(currentTank,currentBlock,eventType{2,i},definedChannel,directorySave,filenameSave,userChunkSize,userT1,userT2);
+                end
             end
+            
         case '33281'        %33281 = snippet
             if (strcmp(epochSamplingRef,'n/a') || strcmp(epochSamplingRef,''))
                 disp('No sampling reference given; extracting snippets without sample references.')
