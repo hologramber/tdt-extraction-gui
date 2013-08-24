@@ -15,6 +15,13 @@ extractedMethod2{1,3} = 'Total Samples';
 extractedMethod2{1,4} = 'Waveform';
 extractedMethod2{1,5} = 'Timestamps';
 
+if exist(directorySave,'dir')
+    disp([directorySave ' found.']);
+else
+    mkdir(directorySave)
+    disp([directorySave ' created.']);
+end
+
 TDTX.GetCodeSpecs(TDTX.StringToEvCode(myEvent))
 fs = TDTX.EvSampFreq;
 ts1 = TDTX.GetValidTimeRangesV;

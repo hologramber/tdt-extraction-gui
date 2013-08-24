@@ -29,6 +29,13 @@ snippetData{1,6} = 'Sampling Reference Store';
 snippetData{1,7} = 'Reference Sampling Freq';
 snippetData{1,8} = 'Snippet Sample #s (Ref)';
 
+if exist(directorySave,'dir')
+    disp([directorySave ' found.']);
+else
+    mkdir(directorySave)
+    disp([directorySave ' created.']);
+end
+    
 % Iterate through the channels.
 for i=1:length(myChannels)
     disp(['Extracting snippets for channel ' num2str(myChannels(i))]);

@@ -14,6 +14,13 @@ if(endTime == 0)
     endTime = TDTX.CurBlockStopTime - TDTX.CurBlockStartTime;
 end
 
+if exist(directorySave,'dir')
+    disp([directorySave ' found.']);
+else
+    mkdir(directorySave)
+    disp([directorySave ' created.']);
+end
+
 % Increase memory limit available to the connection. It expects a number in bytes.
 TDTX.SetGlobalV('WavesMemLimit',maxMemUse*1024*1024);
 

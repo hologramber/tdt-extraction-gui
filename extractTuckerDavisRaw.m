@@ -45,6 +45,13 @@ elseif numvarargs == 3 % The third extra argument will be the data type
     dataType = varargin{3};
 end
 
+if exist(directorySave,'dir')
+    disp([directorySave ' found.']);
+else
+    mkdir(directorySave)
+    disp([directorySave ' created.']);
+end
+
 if strcmp(dataType,'single')
     fidD = fopen([directorySave '\' filenameSave '_Channel_' num2str(Channel) ' ' myEvent '_data.F32'],'w');
     fidT = fopen([directorySave '\' filenameSave '_Channel_' num2str(Channel) ' ' myEvent '_time.F32'],'w');

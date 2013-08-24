@@ -17,6 +17,12 @@ end
 % Increase memory limit available to the connection. It expects a number in bytes.
 TDTX.SetGlobalV('WavesMemLimit',maxMemUse*1024*1024);
 
+if exist(directorySave,'dir')
+    disp([directorySave ' found.']);
+else
+    mkdir(directorySave)
+    disp([directorySave ' created.']);
+end
 
 % Read out the times that the epochs transition, and what value they transition to. These are row vectors.
 numEvents=TDTX.ReadEventsV(1000000,myEpoch,0,0,startTime,endTime,'ALL');
