@@ -2,7 +2,7 @@
 
 Data extraction tools / GUI in MATLAB for wrangling neuro/electrophys data stored in TDT (TuckerDavis Technologies) tank format.
 
-!()[tdtextract_1.png]
+![](tdtextract_1.png)
 
 ### Instructions for Data Extraction
 
