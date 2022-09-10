@@ -1,5 +1,7 @@
 ## TDT-Extraction-Sandbox-GUI
 
+**This is an archived project.**
+
 Data extraction tools / GUI in MATLAB for wrangling neuro/electrophys data stored in TDT (TuckerDavis Technologies) tank format.
 
 ![](tdtextract_1.png)
